@@ -6,7 +6,6 @@ import NavDropdown from 'react-bootstrap/NavDropdown';
 import Modal from 'react-bootstrap/Modal';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styled from "styled-components";
-import { useNavigate } from 'react-router-dom';
 import { useState } from "react";
 import Login from "../Sign/Login";
 import axios from "axios";
