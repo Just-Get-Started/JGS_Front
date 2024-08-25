@@ -2,17 +2,19 @@ import React, { useEffect, useState } from "react";
 import TeamMain from '../imgs/팀페이지.jpeg';
 import styled from "styled-components";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
 const TeamInformation = () => {
     const [teamInfoList, setTeamInfoList] = useState([]);   //한팀 정보
     const [searchKeyword, setSearchKeyword] = useState(''); //팀명으로 검색
     const [createTeamModal, setCreateTeamModal] = useState(false);  //팀 생성 모달
     const [teamName, setTeamName] = useState('');   //팀 생성시 팀명
     const [teamIntroduce, setTeamIntroduce] = useState(''); //팀 생성시 소개
-    const [selectedTeam, setSelectedTeam] = useState(null); // 선택한 팀 정보
-    const [teamInfoModal, setTeamInfoModal] = useState(false);  //팀 정보 모달
     const [page, setPage] = useState(1); //현재 페이지
     const [totalPages, setTotalPages] = useState(1); //전체 페이지
 
+    const navigate = useNavigate();
+    
     //전체 팀 목록
     const teamList = (keyword = '', page = 1) => {
         axios.get(`http://localhost:8080/team/all`, {
@@ -48,14 +50,12 @@ const TeamInformation = () => {
     const createTeamModalbtn = () => {
         setCreateTeamModal(true);
     }
-
-    // 팀 상세 정보 모달
-    const openTeamInfoModal = (team) => {
-        setSelectedTeam(team);
-        console.log(selectedTeam);
-        setTeamInfoModal(true);
-    }
-
+    
+    //팀 상세 정보
+    const handleTeamClick = (teamName) => {
+        navigate(`/team/${teamName}`); // 해당 팀의 상세 페이지로 이동
+    };
+    
     // 팀 생성 버튼
     const createTeambtn = () => {
         axios.post(`http://localhost:8080/api/team`, {
@@ -91,7 +91,7 @@ const TeamInformation = () => {
                 <SubContainer>
                     {teamInfoList.map((team, index) => (
                         <SubLineContainer key={team.teamName + index}>
-                            <TeamName onClick={() => openTeamInfoModal(team)}>팀명: {team.teamName}</TeamName>
+                            <TeamName onClick={() => handleTeamClick(team.teamName)}>팀명: {team.teamName}</TeamName>
                             <TierName>티어: {team.tier.tierName}</TierName>
                             <CreateDate>창단일: {new Date(team.createDate).toLocaleDateString()}</CreateDate>
                         </SubLineContainer>
@@ -120,19 +120,6 @@ const TeamInformation = () => {
                         <CloseButton onClick={() => setCreateTeamModal(false)}>취소</CloseButton>
                         <SubmitButton onClick={createTeambtn}>생성</SubmitButton>
                     </ModalContent>
-                </ModalOverlay>
-            )}
-            {teamInfoModal && selectedTeam && (
-                <ModalOverlay>
-                    <ModalTeamContent>
-                        <h2>팀명: {selectedTeam.teamName}</h2>
-                        <p><strong>티어:</strong> {selectedTeam.tier.tierName}</p>
-                        <p><strong>창단일:</strong> {new Date(selectedTeam.createDate).toLocaleDateString()}</p>
-                        <p><strong>최근 매치 날짜:</strong> {selectedTeam.lastMatchDate ? 
-                        new Date(selectedTeam.lastMatchDate).toLocaleDateString() : '최근 경기가 없습니다.'}</p>
-                        <p><strong>팀 소개:</strong> {selectedTeam.introduce}</p>
-                        <CloseButton onClick={() => setTeamInfoModal(false)}>닫기</CloseButton>
-                    </ModalTeamContent>
                 </ModalOverlay>
             )}
                 <PaginationContainer>
@@ -296,16 +283,6 @@ const ModalContent = styled.div`
     text-align: center;
 `;
 
-const ModalTeamContent = styled.div`
-    background-color: white;
-    padding: 20px;
-    border-raidus: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 400px;
-    height: 400px;
-    text-align: left;
-    border: 1px solid;
-`
 const InputLabel = styled.label`
     display: block;
     margin: 10px 0 5px;
