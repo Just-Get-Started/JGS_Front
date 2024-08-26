@@ -8,6 +8,7 @@ const TeamDetail = () => {
 
     const {teamName} = useParams();
     const [teamDetail, setTeamDetail] = useState(null);
+    const [leader, setLeader] = useState("");
 
         // 팀 상세 정보 
         useEffect(() => {
@@ -15,6 +16,13 @@ const TeamDetail = () => {
                 params: { teamName }
             }).then((res) => {
                 setTeamDetail(res.data); // 가져온 팀 정보로 상태 업데이트
+                const leader = res.data.teamMemberListDTO.teamMemberDTOList.find(
+                    (member) => member.role ==="Leader"
+                );  
+                if(leader) {
+                    setLeader(leader.teamMemberName);
+                }
+                console.log(res.data);
             }).catch((err) => {
                 console.log(err);
             });
@@ -32,6 +40,7 @@ const TeamDetail = () => {
                 <p><strong>최근 매치 날짜:</strong> {teamDetail.lastMatchDate ? 
                 new Date(teamDetail.lastMatchDate).toLocaleDateString() : '최근 경기가 없습니다.'}</p>
                 <p><strong>팀 소개:</strong> {teamDetail.introduce}</p>
+                <p><strong>팀장: {leader}</strong></p>
             </Container>
         );
     };

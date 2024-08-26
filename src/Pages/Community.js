@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 const Community = () => {
 
     const [comList, setComList] = useState([]);
-    const [searchtitle, setSearchTitle] = useState(''); // 글명으로 검색
+    const [searchTitle, setSearchTitle] = useState(''); // 글명으로 검색
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -38,7 +38,7 @@ const Community = () => {
 
     //글 작성
     const writingButton = () => {
-
+        navigate("/writingcommunity");
     }
 
     return (
@@ -50,7 +50,7 @@ const Community = () => {
                         <SearchInput 
                             type="text" 
                             placeholder="글명을 입력하세요..." 
-                            value={searchtitle} 
+                            value={searchTitle} 
                             onChange={(e) => setSearchTitle(e.target.value)} 
                         />
                     </RightContainer>

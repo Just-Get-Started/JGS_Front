@@ -9,6 +9,7 @@ import Match from './Pages/Match';
 import MyPage from './Pages/MyPage';
 import TeamInformation from './Pages/TeamInformation';
 import TeamDetail from './Components/TeamDetail';
+import WritingCommunity from './Pages/WritingCommunity';
 
 function App() {
   return (
@@ -22,7 +23,8 @@ function App() {
         <Route path="/match" element={<Match/>}></Route>
         <Route path="/mypage" element={<MyPage/>}></Route>
         <Route path="/teampage" element={<TeamInformation/>}></Route>
-        <Route path="/team/:teamName" element={<TeamDetail />} />
+        <Route path="/team/:teamName" element={<TeamDetail/>} />
+        <Route path="/writingcommunity" element={<WritingCommunity/>}></Route>
         </Routes>
       </BrowserRouter>
     </div>
