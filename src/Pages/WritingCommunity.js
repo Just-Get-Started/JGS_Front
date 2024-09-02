@@ -37,6 +37,7 @@ const WritingCommunity = () => {
 
     // 제출 버튼 클릭 처리 함수
     const submitButton = () => {
+        console.log("Selected Team:", selectedTeam);
         axios.post(`http://localhost:8080/api/community`, {
             title: title,
             content: content,
