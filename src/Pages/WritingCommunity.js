@@ -2,14 +2,17 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const WritingCommunity = () => {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
-    const [checked, setChecked] = useState(false);
+    const [checked, setChecked] = useState(0); // 0: 일반 글, 1: 모집 글
     const [teamOptions, setTeamOptions] = useState([]); // 팀 목록
     const [selectedTeam, setSelectedTeam] = useState(''); // 선택된 팀
     const [loading, setLoading] = useState(true);
+    const [recruitDate, setRecruitDate] = useState(null);
     const navigate = useNavigate();
 
     // 팀 목록을 가져오는 useEffect
@@ -37,13 +40,19 @@ const WritingCommunity = () => {
 
     // 제출 버튼 클릭 처리 함수
     const submitButton = () => {
+        console.log("Recruit Type (checked):", checked);
         console.log("Selected Team:", selectedTeam);
-        axios.post(`http://localhost:8080/api/community`, {
+    
+        // 기본 요청 데이터
+        let requestData = {
             title: title,
             content: content,
             recruit: checked,
-            teamName: selectedTeam
-        }, {
+            recruitDate: checked === 1 && recruitDate ? recruitDate.toISOString() : null,
+            teamName: checked === 1 ? selectedTeam : ""
+        };
+    
+        axios.post("http://localhost:8080/api/community", requestData, {
             headers: {
                 'Access_Token': localStorage.getItem('Access_Token')
             }
@@ -53,6 +62,7 @@ const WritingCommunity = () => {
             console.error(err);
         });
     };
+    
 
     if (loading) {
         return <div>Loading...</div>; // 데이터 로딩 중 표시
@@ -73,23 +83,34 @@ const WritingCommunity = () => {
                 <RadioContainer>
                     <RadioLabel>
                         <RadioInput 
-                            type="radio" 
-                            value={0} 
-                            checked={checked === false}
-                            onChange={() => setChecked(false)}
+                            type="radio"
+                            value={0}
+                            checked={checked === 0}
+                            onChange={() => setChecked(0)}
                         />
                         일반 글
                     </RadioLabel>
                     <RadioLabel>
                         <RadioInput 
                             type="radio" 
-                            value={1} 
-                            checked={checked === true}
-                            onChange={() => setChecked(true)}
+                            value={1}
+                            checked={checked === 1}
+                            onChange={() => setChecked(1)}
                         />
                         모집 글
                     </RadioLabel>
                 </RadioContainer>
+                {checked === 1 && (
+                    <RecruitDateContainer>
+                        <TeamLabel>모집 마감 날짜:</TeamLabel>
+                        <DatePicker
+                            selected={recruitDate}
+                            onChange={(date) => setRecruitDate(date)}
+                            dateFormat="yyyy-MM-dd"
+                            placeholderText="마감 날짜를 선택하세요"
+                        />
+                    </RecruitDateContainer>
+                )}
                 <TeamSelectionContainer>
                     <TeamLabel>소속 팀 선택:</TeamLabel>
                     <TeamSelect 
@@ -242,4 +263,10 @@ const TeamSelect = styled.select`
     border: 1px solid #ccc;
 `;
 
+const RecruitDateContainer = styled.div`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 20px 0;
+`;
 export default WritingCommunity;

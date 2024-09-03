@@ -12,7 +12,7 @@ const TeamInformation = () => {
     const [teamIntroduce, setTeamIntroduce] = useState(''); //팀 생성시 소개
     const [page, setPage] = useState(1); //현재 페이지
     const [totalPages, setTotalPages] = useState(1); //전체 페이지
-
+    
     const navigate = useNavigate();
     
     //전체 팀 목록

@@ -59,6 +59,11 @@ const TeamDetail = () => {
         });
     };
 
+    //팀 가입 버튼
+    const joinButton = () => {
+
+    }
+
     return (
         <Container>
             <h2>팀명: {teamDetail.teamName}</h2>
@@ -74,7 +79,7 @@ const TeamDetail = () => {
                 ))}
             </p>
             <ButtonContainer onClick={modifyButton}>수정</ButtonContainer>
-
+            <JoinContainer onClick={joinButton}>가입</JoinContainer>
             {isOpenModal && (
                 <ModalOverlay>
                     <ModalContent>
@@ -121,6 +126,20 @@ const ButtonContainer = styled.button`
         background-color: #0056b3;
     }
 `;
+
+const JoinContainer = styled.button`
+    padding: 10px 20px;
+    margin-top: 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+
+    &:hover {
+        background-color: #0056b3;
+    }
+`
 
 const ModalOverlay = styled.div`
     position: fixed;
