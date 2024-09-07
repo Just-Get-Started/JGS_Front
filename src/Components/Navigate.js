@@ -18,6 +18,8 @@ const Navigate = () => {
   const userName = userInfo ? userInfo.name : null;
   const [showNotifications, setShowNotifications] = useState(false); // 알림 드롭다운을 열고 닫는 상태
   const [notifications, setNotifications] = useState([]); // 초기 알림 데이터는 빈 배열
+  const [applyModal, setApplyModal] = useState(false); // 팀 지원자 정보 모달
+  const [selectedMember, setSelectedMember] = useState(null);
 
   const handleLoginClick = () => {
     setLoginModal(true);
@@ -30,6 +32,17 @@ const Navigate = () => {
   const toggleNotifications = () => {
     setShowNotifications(!showNotifications);
   };
+
+  // 지원자 정보 토글
+  const toggleApplyModal = (member) => {
+    setSelectedMember(member);
+    setApplyModal(true);
+  }
+
+  const handleCloseApplyModal = () => {
+    setApplyModal(false);
+    setSelectedMember(null); // 모달 닫을 때 선택된 지원자 정보 초기화
+  }
 
   // 로그아웃
   const onLogout = () => {
@@ -68,6 +81,47 @@ const Navigate = () => {
     getnotification();
   },[]);
 
+  // 멤버요청수락
+  const handleAccept = () => {
+    axios.delete(`http://localhost:8080/api/team-join`, {
+      data: {
+        joinNotificationId: selectedMember.notificationId,
+        isJoin: true
+      },
+        headers: {
+          'Access_Token': localStorage.getItem('Access_Token')
+      }
+    }).then((res) => {
+      console.log(res.data);
+      alert("지원자의 요청이 수락되었습니다.")
+      handleCloseApplyModal();
+      getnotification(); 
+    }).catch((err) => {
+      console.log(err);
+      alert("수락을 실패하였습니다.")
+    })
+  }
+
+  //멤버 요청 거절
+  const handleReject = () => {
+    axios.delete(`http://localhost:8080/api/team-join`, {
+      data: {
+        joinNotificationId: selectedMember.notificationId,
+        isJoin: false
+      },
+        headers: {
+          'Access_Token': localStorage.getItem('Access_Token')
+        }
+    }).then((res) => {
+      alert("지원자의 요청을 거절하였습니다.")
+      handleCloseApplyModal();
+      getnotification(); 
+    }).catch((err) => {
+      console.log(err);
+      alert("거절을 실패하였습니다.")
+    })
+  }
+
   return (
     <>
       <Navbar expand="lg" className="bg-body-tertiary">
@@ -94,7 +148,7 @@ const Navigate = () => {
                     <NotiDropdown>
                       {notifications && notifications.length > 0 ? (
                         notifications.map((noti, index) => (
-                          <NotiItem key={noti.notificationId}>
+                          <NotiItem key={noti.notificationId} onClick={() => toggleApplyModal(noti)}>
                             {noti.memberName}님이 {noti.teamName}에 지원하였습니다.
                             </NotiItem>
                         ))
@@ -116,6 +170,31 @@ const Navigate = () => {
         </Modal.Header>
         <Modal.Body>
           <Login />
+        </Modal.Body>
+      </Modal>
+      <Modal show={applyModal} onHide={handleCloseApplyModal} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>지원자 정보</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedMember ? (
+            <>
+              <p><strong>지원자:</strong> {selectedMember.memberName}</p>
+              <p><strong>지원자 아이디:</strong> {selectedMember.memberId}</p>
+              <p><strong>지원 팀:</strong> {selectedMember.teamName}</p>
+              <p><strong>지원 날짜:</strong> {new Date(selectedMember.date).toLocaleDateString()}</p>
+              <ButtonWrapper>
+              <ActionButton onClick={() => handleAccept(selectedMember.memberId)}>
+          수락
+        </ActionButton>
+        <ActionButton onClick={() => handleReject(selectedMember.memberId)}>
+          거절
+        </ActionButton>
+      </ButtonWrapper>
+            </>
+          ) : (
+            <p>지원자 정보를 불러오지 못했습니다.</p>
+          )}
         </Modal.Body>
       </Modal>
     </>
@@ -164,6 +243,34 @@ const NotiItem = styled.div`
   }
   &:hover {
     background-color: #f9f9f9;
+  }
+  cursor: pointer;
+`;
+
+const ButtonWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+`;
+
+const ActionButton = styled.button`
+  background-color: #007bff;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #0056b3;
+  }
+
+  &:nth-child(2) {
+    background-color: #dc3545;
+
+    &:hover {
+      background-color: #c82333;
+    }
   }
 `;
 
