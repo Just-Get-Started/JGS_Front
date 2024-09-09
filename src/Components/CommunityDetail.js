@@ -105,7 +105,7 @@ const CommunityDetail = () => {
           alert("가입 신청이 성공적으로 처리되었습니다.");
         }
       ).catch((err) => {
-        alert("중복 가입신청되었습니다.");
+        alert("본인 팀에 가입할 수 없습니다.");
       });
     }
 

@@ -9,6 +9,7 @@ import MyPage from './Pages/MyPage';
 import TeamInformation from './Pages/TeamInformation';
 import TeamDetail from './Components/TeamDetail';
 import WritingCommunity from './Pages/WritingCommunity';
+import Player from './Pages/Player';
 import { useEffect } from 'react';
 import { EventSourcePolyfill } from "event-source-polyfill";
 
@@ -68,6 +69,7 @@ function App() {
         <Route path="/teampage" element={<TeamInformation/>}></Route>
         <Route path="/team/:teamName" element={<TeamDetail/>} />
         <Route path="/writingcommunity" element={<WritingCommunity/>}></Route>
+        <Route path="/player" element={<Player/>}></Route>
         </Routes>
       </BrowserRouter>
     </div>

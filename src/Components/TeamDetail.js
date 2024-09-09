@@ -80,6 +80,7 @@ const TeamDetail = () => {
             </p>
             <ButtonContainer onClick={modifyButton}>수정</ButtonContainer>
             <JoinContainer onClick={joinButton}>가입</JoinContainer>
+
             {isOpenModal && (
                 <ModalOverlay>
                     <ModalContent>

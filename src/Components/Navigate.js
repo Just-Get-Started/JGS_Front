@@ -82,43 +82,29 @@ const Navigate = () => {
   },[]);
 
   // 멤버요청수락
-  const handleAccept = () => {
+  const handleAccept = (isJoin) => {
     axios.delete(`http://localhost:8080/api/team-join`, {
       data: {
         joinNotificationId: selectedMember.notificationId,
-        isJoin: true
+        isJoin: isJoin
       },
         headers: {
           'Access_Token': localStorage.getItem('Access_Token')
       }
     }).then((res) => {
-      console.log(res.data);
-      alert("지원자의 요청이 수락되었습니다.")
+      if(isJoin) {
+        alert("지원자의 요청이 수락되었습니다.")
+      } else {
+        alert("지원자의 요청을 거절하였습니다.");
+      }
       handleCloseApplyModal();
       getnotification(); 
     }).catch((err) => {
-      console.log(err);
-      alert("수락을 실패하였습니다.")
-    })
-  }
-
-  //멤버 요청 거절
-  const handleReject = () => {
-    axios.delete(`http://localhost:8080/api/team-join`, {
-      data: {
-        joinNotificationId: selectedMember.notificationId,
-        isJoin: false
-      },
-        headers: {
-          'Access_Token': localStorage.getItem('Access_Token')
-        }
-    }).then((res) => {
-      alert("지원자의 요청을 거절하였습니다.")
-      handleCloseApplyModal();
-      getnotification(); 
-    }).catch((err) => {
-      console.log(err);
-      alert("거절을 실패하였습니다.")
+      if(isJoin) {
+        alert("수락을 실패하였습니다.")
+      } else {
+        alert("거절을 실패하였습니다.")
+      }
     })
   }
 
@@ -135,6 +121,7 @@ const Navigate = () => {
               <NavDropdown title="Dropdown" id="basic-nav-dropdown">
                 <NavDropdown.Item href="/mypage">내정보</NavDropdown.Item>
                 <NavDropdown.Item href="/teampage">팀정보</NavDropdown.Item>
+                <NavDropdown.Item href="/player">선수정보</NavDropdown.Item>  
                 {userInfo && (
                   <NavDropdown.Item onClick={onLogout}>로그아웃</NavDropdown.Item>
                 )}
@@ -184,13 +171,9 @@ const Navigate = () => {
               <p><strong>지원 팀:</strong> {selectedMember.teamName}</p>
               <p><strong>지원 날짜:</strong> {new Date(selectedMember.date).toLocaleDateString()}</p>
               <ButtonWrapper>
-              <ActionButton onClick={() => handleAccept(selectedMember.memberId)}>
-          수락
-        </ActionButton>
-        <ActionButton onClick={() => handleReject(selectedMember.memberId)}>
-          거절
-        </ActionButton>
-      </ButtonWrapper>
+              <ActionButton onClick={() => handleAccept(true)}>수락</ActionButton>
+              <ActionButton onClick={() => handleAccept(false)}>거절</ActionButton>
+              </ButtonWrapper>
             </>
           ) : (
             <p>지원자 정보를 불러오지 못했습니다.</p>
