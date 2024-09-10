@@ -10,20 +10,25 @@ const Player = () => {
     const [playerInfoList, setPlayerInfoList] = useState([]);
     const [isOpenModal, setIsOpenModal] = useState(false);
     const [selectedPlayer, setSelectedPlayer] = useState(null);     //선수 클릭 정보
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [last, setLast] = useState(false);
 
     useEffect(()=> {
         axios.get(`http://localhost:8080/member`, {
             params: {
-                page: 0,
+                page: page-1,
                 keyword: keyword
             }
         }).then((res) => {
             console.log(res.data);
             setPlayerInfoList(res.data.memberDTOList);
+            setTotalPages(res.data.totalPages);
+            setLast(res.data.last);
         }).catch((err) => {
             console.log(err);
         })
-    }, [keyword]);
+    }, [page, keyword]);
 
     const handlePlayerClick = (player) => {
         setSelectedPlayer(player);
@@ -33,6 +38,19 @@ const Player = () => {
     const closeModal = () => {
         setIsOpenModal(false);
         setSelectedPlayer(null);
+    }
+
+    //이전 페이지로 이동
+    const handlePrevPage = () => {
+        if (page >1 ) {
+            setPage(page -1);
+        }
+    }
+
+    const handleNextPage = () => {
+        if (!last) {
+            setPage(page + 1);
+        }
     }
 
     return (
@@ -74,6 +92,15 @@ const Player = () => {
                         </PlayerList>
                     </PlayerContainer>
                 </PlayerListContainer>
+                <PaginationContainer>
+                    <PaginationButton onClick={handlePrevPage} disabled={page === 1}>
+                        이전
+                    </PaginationButton>
+                    <PaginationText>{page} / {totalPages}</PaginationText>
+                    <PaginationButton onClick={handleNextPage} disabled={last}>
+                        다음
+                    </PaginationButton>
+                </PaginationContainer>
             </CenterContainer>
             {isOpenModal && selectedPlayer && (
                 <Modal>
@@ -218,5 +245,34 @@ const ModalContent = styled.div`
     border-radius: 10px;
     width: 400px;
     text-align: center;
+`;
+
+const PaginationContainer = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+`;
+
+const PaginationButton = styled.button`
+    padding: 10px 20px;
+    font-size: 16px;
+    margin: 0 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    &:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+`;
+
+const PaginationText = styled.span`
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    margin: 0 15px;
 `;
 export default Player;

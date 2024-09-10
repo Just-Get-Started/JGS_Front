@@ -8,20 +8,25 @@ const Community = () => {
     const [comList, setComList] = useState([]);
     const [searchTitle, setSearchTitle] = useState(''); // 글명으로 검색
     const navigate = useNavigate();
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [last, setLast] = useState(false);
 
     useEffect(() => {
         axios.get("http://localhost:8080/community/all", {
             params: {
-                page: 0,
-                keyword: ''
+                page: page-1,
+                keyword: searchTitle
             }
         }).then((res) => {
-            setComList(res.data.communityDTOList); // 데이터에서 communityDTOList를 가져옴
             console.log(res.data);
+            setComList(res.data.communityDTOList); // 데이터에서 communityDTOList를 가져옴
+            setTotalPages(res.data.totalPages);
+            setLast(res.data.last);
         }).catch((err) => {
             console.log(err);
         });
-    }, [searchTitle]);
+    }, [page, searchTitle]);
 
     // 모집 날짜 비교 함수
     const isRecruiting = (community) => {
@@ -38,6 +43,20 @@ const Community = () => {
     // 글 작성
     const writingButton = () => {
         navigate("/writingcommunity");
+    }
+
+    //이전 페이지로 이동
+    const handlePrevPage = () => {
+        if (page > 1) {
+            setPage(page -1);
+        }
+    }
+
+    //다음 페이지로 이동
+    const handleNextPage = () => {
+        if (!last) {
+            setPage(page + 1);
+        }
     }
 
     return (
@@ -76,6 +95,15 @@ const Community = () => {
                         </SubLineContainer>
                     ))}
                 </SubContainer>
+                <PaginationContainer>
+                    <PaginationButton onClick={handlePrevPage} disabled={page === 1}>
+                        이전
+                    </PaginationButton>
+                    <PaginationText>{page} / {totalPages}</PaginationText>
+                    <PaginationButton onClick={handleNextPage} disabled={last}>
+                        다음
+                    </PaginationButton>
+                </PaginationContainer>
             </CenterContainer>
             <WritingContainer>
                 <WritingButton onClick={writingButton}>글 작성</WritingButton>
@@ -200,4 +228,32 @@ const WritingButton = styled.button`
     }
 `
 
+const PaginationContainer = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+`;
+
+const PaginationButton = styled.button`
+    padding: 10px 20px;
+    font-size: 16px;
+    margin: 0 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    &:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+`;
+
+const PaginationText = styled.span`
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    margin: 0 15px;
+`;
 export default Community;
