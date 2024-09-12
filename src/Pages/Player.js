@@ -47,6 +47,7 @@ const Player = () => {
         }
     }
 
+    //다음 페이지로 이동
     const handleNextPage = () => {
         if (!last) {
             setPage(page + 1);

@@ -118,6 +118,7 @@ const Navigate = () => {
             <Nav className="me-auto">
               <Nav.Link href="/match">Match</Nav.Link>
               <Nav.Link href="/community">Community</Nav.Link>
+              <Nav.Link href="/conference">Conference</Nav.Link>
               <NavDropdown title="Dropdown" id="basic-nav-dropdown">
                 <NavDropdown.Item href="/mypage">내정보</NavDropdown.Item>
                 <NavDropdown.Item href="/teampage">팀정보</NavDropdown.Item>
