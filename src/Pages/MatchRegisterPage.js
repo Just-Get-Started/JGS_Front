@@ -174,7 +174,6 @@ const MainContainer = styled.div`
 const MapContainer = styled.div`
     display: flex;
     justify-content: center;
-    background-color: gray;
     height: 50vh;
     width: 80%;
     margin-top: 3rem;
@@ -196,7 +195,6 @@ const CalenderContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color:pink;
   font-size: 30px;
 `;
 
@@ -205,7 +203,6 @@ const MiddleContainer = styled.div`
     flex-direction: column;
     height: 500px;
     width: 80%;
-    background-color: red;
     margin-top: 2rem;
     font-size: 30px;
 `
