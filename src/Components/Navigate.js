@@ -10,6 +10,7 @@ import { useState } from "react";
 import Login from "../Sign/Login";
 import axios from "axios";
 import NotiImg from '../imgs/알림.png'
+import { useNavigate } from "react-router-dom";
 
 const Navigate = () => {
   const [loginModal, setLoginModal] = useState(false);
@@ -20,6 +21,7 @@ const Navigate = () => {
   const [notifications, setNotifications] = useState([]); // 초기 알림 데이터는 빈 배열
   const [applyModal, setApplyModal] = useState(false); // 팀 지원자 정보 모달
   const [selectedMember, setSelectedMember] = useState(null); // 지원자 정보
+  const navigate = useNavigate();
 
   const handleLoginClick = () => {
     setLoginModal(true);
@@ -71,9 +73,10 @@ const Navigate = () => {
       }
     })
     .then((res) => {
+      const joinNotifications = Array.isArray(res.data.joinNotifications) ? res.data.joinNotifications : [];
       setNotifications((prevNotifications) => [
         ...prevNotifications,
-        ...res.data.joinNotifications
+        ...joinNotifications
       ]);
       console.log("팀가입알림 ", res.data.joinNotifications);
     }).catch((err) => {
@@ -134,11 +137,11 @@ const Navigate = () => {
 
   // 매치 승인여부
   const handleMatch = (status) => {
-    const matchNotificationId = notifications.map(noti => noti.matchNotificationId);
+    const matchNotificationId = selectedMember.matchNotificationId;
     console.log(matchNotificationId)
     axios.delete(`http://localhost:8080/api/match/notification`, {
       data: {
-        matchnotification: matchNotificationId,
+        matchNotificationId: matchNotificationId,
         status: status
       }, 
         headers: {
@@ -147,6 +150,7 @@ const Navigate = () => {
     }).then((res) => {
         if(status) {
           alert("매치를 수락하였습니다.")
+          navigate("/");
         } else {
           alert("매치를 거절하였습니다.");
         }
@@ -219,30 +223,35 @@ const Navigate = () => {
           <Modal.Title>지원자 정보</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {selectedMember ? (
-            <>
-            {selectedMember.matchNotificationId ? (
-              <>
-              <p><strong>매치 신청 팀:</strong> {selectedMember.teamName}</p>
-              <p><strong>신청 날짜:</strong> {new Date(selectedMember.date).toLocaleDateString()}</p>
-              </>
-            ) : (
-              <>
-              <p><strong>지원자:</strong> {selectedMember.memberName}</p>
-              <p><strong>지원자 아이디:</strong> {selectedMember.memberId}</p>
-              <p><strong>지원 팀:</strong> {selectedMember.teamName}</p>
-              <p><strong>지원 날짜:</strong> {new Date(selectedMember.date).toLocaleDateString()}</p>
-            </>
-            )}
-              <ButtonWrapper>
-              <ActionButton onClick={() => handleAccept(true)}>수락</ActionButton>
-              <ActionButton onClick={() => handleAccept(false)}>거절</ActionButton>
-              </ButtonWrapper>
-            </>
-          ) : (
-            <p>지원자 정보를 불러오지 못했습니다.</p>
-          )}
-        </Modal.Body>
+  {selectedMember ? (
+    <>
+      {selectedMember.matchNotificationId ? (
+        <>
+          <p><strong>매치 신청 팀:</strong> {selectedMember.teamName}</p>
+          <p><strong>신청 날짜:</strong> {new Date(selectedMember.date).toLocaleDateString()}</p>
+          <ButtonWrapper>
+            <ActionButton onClick={() => handleMatch(true)}>수락</ActionButton>
+            <ActionButton onClick={() => handleMatch(false)}>거절</ActionButton>
+          </ButtonWrapper>
+        </>
+      ) : (
+        <>
+          <p><strong>지원자:</strong> {selectedMember.memberName}</p>
+          <p><strong>지원자 아이디:</strong> {selectedMember.memberId}</p>
+          <p><strong>지원 팀:</strong> {selectedMember.teamName}</p>
+          <p><strong>지원 날짜:</strong> {new Date(selectedMember.date).toLocaleDateString()}</p>
+          <ButtonWrapper>
+            <ActionButton onClick={() => handleAccept(true)}>수락</ActionButton>
+            <ActionButton onClick={() => handleAccept(false)}>거절</ActionButton>
+          </ButtonWrapper>
+        </>
+      )}
+    </>
+  ) : (
+    <p>지원자 정보를 불러오지 못했습니다.</p>
+  )}
+</Modal.Body>
+
       </Modal>
     </>
   );
