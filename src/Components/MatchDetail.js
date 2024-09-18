@@ -119,7 +119,11 @@ const MatchDetail = () => {
             console.log(res.data);
             setIsApplyModal(false);
             alert("매치 신청이 완료되었습니다.");
-        }).catch((err) => console.log(err));
+        }).catch((err) => {
+            alert("이미 종료된 매치입니다.")
+            navigate("/match")
+        }
+        );
     };
 
     const contactButton = () => {

@@ -74,10 +74,15 @@ const Navigate = () => {
     })
     .then((res) => {
       const joinNotifications = Array.isArray(res.data.joinNotifications) ? res.data.joinNotifications : [];
-      setNotifications((prevNotifications) => [
-        ...prevNotifications,
-        ...joinNotifications
-      ]);
+      setNotifications((prevNotifications) => {
+        const combined = [...prevNotifications, ...joinNotifications];
+        // 중복 제거 (notificationId 또는 matchNotificationId 기준)
+        const uniqueNotifications = combined.filter(
+          (notification, index, self) =>
+            index === self.findIndex((n) => n.notificationId === notification.notificationId)
+        );
+        return uniqueNotifications;
+    });
       console.log("팀가입알림 ", res.data.joinNotifications);
     }).catch((err) => {
       console.log(err);
@@ -91,11 +96,17 @@ const Navigate = () => {
             'Access_Token' : localStorage.getItem('Access_Token')
         }
       }).then((res) => {
-        setNotifications((prevNotifications) => [
-          ...prevNotifications,
-          ...res.data.matchNotificationDTOList
-        ]);
-        console.log("매치 신청 알림", res.data.matchNotificationDTOList);
+        const matchNotificationDTOList = Array.isArray(res.data.matchNotificationDTOList) ? res.data.matchNotificationDTOList : [];
+        setNotifications((prevNotifications) => {
+          const combined = [...prevNotifications, ...matchNotificationDTOList];
+          // 중복 제거 (notificationId 또는 matchNotificationId 기준)
+          const uniqueNotifications = combined.filter(
+            (notification, index, self) =>
+              index === self.findIndex((n) => n.matchNotificationId === notification.matchNotificationId)
+          );
+          return uniqueNotifications;
+        });
+        console.log("매치 신청 알림", matchNotificationDTOList);
       }).catch((err) => {
         console.log(err);
       });
