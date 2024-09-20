@@ -3,10 +3,9 @@ import { useState, useEffect } from "react";
 import styled from "styled-components";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 const ConferenceDetail = () => {
-
-
     const location = useLocation();
     const conference = location.state?.conference;  //선택된 대회 정보
     const navigate = useNavigate();
@@ -15,7 +14,10 @@ const ConferenceDetail = () => {
         timeZone: 'UTC'});
         console.log(conference)
     console.log(conference.conferenceDate);
-    
+    const token = localStorage.getItem('Access_Token');
+    const decodedToken = jwtDecode(token);
+    const memberId = decodedToken?.member_id;
+    console.log(memberId);
     const backButton = () => {
         navigate("/conference");
     }

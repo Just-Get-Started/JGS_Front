@@ -51,6 +51,11 @@ const Conference = () => {
         }
     }
 
+    // 대회 개최페이지 이동 버튼
+    const postConference = () => {
+        navigate("/ConferenceRegisterPage");  
+        }
+    
     return (
         <MainContainer>
             <TopContainer>
@@ -95,6 +100,9 @@ const Conference = () => {
                 {selectedConference &&
                 <ConferenceDetail conference={selectedConference} />}
             </CenterContainer>
+            <WritingContainer>
+                <WritingButton onClick={postConference}>대회 개최</WritingButton>
+            </WritingContainer>
         </MainContainer>
     )
 }
@@ -206,6 +214,8 @@ const PaginationContainer = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: row;
+    width: 70%;
     margin-top: 20px;
 `;
 
@@ -230,4 +240,19 @@ const PaginationText = styled.span`
     color: #333;
     margin: 0 15px;
 `;
+
+const WritingContainer = styled.div`
+    display: flex;
+    justify-content: right;
+    width: 70%;
+
+`
+
+const WritingButton = styled.button`
+    background-color: white;
+    border-radius: 1rem;
+    border: 1px solid;
+    font-size: 20px;
+    margin-bottom: 1rem;
+`
 export default Conference;

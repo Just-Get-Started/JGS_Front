@@ -17,6 +17,7 @@ import { EventSourcePolyfill } from "event-source-polyfill";
 import MatchDetail from './Components/MatchDetail';
 import MatchResult from './Pages/MatchResult';
 import ConferenceDetail from './Components/ConferenceDetail';
+import ConferenceRegisterPage from './Pages/ConferenceRegisterPage';
 
 function App() {
   useEffect(() => {
@@ -80,6 +81,7 @@ function App() {
         <Route path="/matchdetail/:matchPostId" element={<MatchDetail/>}></Route>
         <Route path="/matchresult" element={<MatchResult/>}></Route>
         <Route path="/conferencedetail/:conferenceName" element={<ConferenceDetail/>} />
+        <Route path="/ConferenceRegisterPage" element={<ConferenceRegisterPage/>}/>
         </Routes>
       </BrowserRouter>
     </div>
