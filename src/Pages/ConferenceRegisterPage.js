@@ -12,16 +12,17 @@ const ConferenceRegisterPage = () => {
     const [errors, setErrors] = useState('');
     
     const handlePostConference = () => {
+
         if (!conferenceName) {
             alert("대회명을 입력해주세요.");
-            return; // 유효하지 않으면 요청을 보내지 않음
+            return; 
         }
         
         // 날짜 형식 검사 (xxxx.yy.mm 형식)
         const dateRegex = /^\d{4}\.\d{2}\.\d{2}$/;
         if (!dateRegex.test(conferenceDate)) {
             alert("날짜 형식이 올바르지 않습니다. (예: 2024.09.08)");
-            return; // 유효하지 않으면 요청을 보내지 않음
+            return; 
         }
         
         // 입력된 날짜 문자열을 Date 객체로 변환
