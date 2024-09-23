@@ -184,11 +184,12 @@ const Navigate = () => {
             <Nav className="me-auto">
               <Nav.Link href="/match">Match</Nav.Link>
               <Nav.Link href="/community">Community</Nav.Link>
-              <Nav.Link href="/conference">Conference</Nav.Link>
+              <Nav.Link href="/conference">Conference</Nav.Link>              
               <NavDropdown title="Dropdown" id="basic-nav-dropdown">
                 <NavDropdown.Item href="/mypage">내정보</NavDropdown.Item>
                 <NavDropdown.Item href="/teampage">팀정보</NavDropdown.Item>
-                <NavDropdown.Item href="/player">선수정보</NavDropdown.Item>  
+                <NavDropdown.Item href="/player">선수정보</NavDropdown.Item>
+                <NavDropdown.Item href="/matchresult">매치 결과</NavDropdown.Item>
                 {userInfo && (
                   <NavDropdown.Item onClick={onLogout}>로그아웃</NavDropdown.Item>
                 )}
@@ -262,7 +263,6 @@ const Navigate = () => {
     <p>지원자 정보를 불러오지 못했습니다.</p>
   )}
 </Modal.Body>
-
       </Modal>
     </>
   );

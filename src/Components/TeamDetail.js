@@ -59,11 +59,6 @@ const TeamDetail = () => {
         });
     };
 
-    //팀 가입 버튼
-    const joinButton = () => {
-
-    }
-
     return (
         <Container>
             <h2>팀명: {teamDetail.teamName}</h2>
@@ -79,7 +74,6 @@ const TeamDetail = () => {
                 ))}
             </p>
             <ButtonContainer onClick={modifyButton}>수정</ButtonContainer>
-            <JoinContainer onClick={joinButton}>가입</JoinContainer>
 
             {isOpenModal && (
                 <ModalOverlay>
