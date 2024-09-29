@@ -21,6 +21,7 @@ const Navigate = () => {
   const [notifications, setNotifications] = useState([]); // 초기 알림 데이터는 빈 배열
   const [applyModal, setApplyModal] = useState(false); // 팀 지원자 정보 모달
   const [selectedMember, setSelectedMember] = useState(null); // 지원자 정보
+
   const navigate = useNavigate();
 
   const handleLoginClick = () => {
@@ -65,30 +66,6 @@ const Navigate = () => {
       });
   };
 
-  // 팀 가입 알림
-  const getnotification = () => {
-    axios.get(`http://localhost:8080/api/team-join`, {
-      headers: {
-        'Access_Token': localStorage.getItem('Access_Token')
-      }
-    })
-    .then((res) => {
-      const joinNotifications = Array.isArray(res.data.joinNotifications) ? res.data.joinNotifications : [];
-      setNotifications((prevNotifications) => {
-        const combined = [...prevNotifications, ...joinNotifications];
-        // 중복 제거 (notificationId 또는 matchNotificationId 기준)
-        const uniqueNotifications = combined.filter(
-          (notification, index, self) =>
-            index === self.findIndex((n) => n.notificationId === notification.notificationId)
-        );
-        return uniqueNotifications;
-    });
-      console.log("팀가입알림 ", res.data.joinNotifications);
-    }).catch((err) => {
-      console.log(err);
-    })
-  };
-
     // 팀 매치 알림
     const matchnotification = () => {
       axios.get(`http://localhost:8080/api/match/notification`, {
@@ -111,10 +88,60 @@ const Navigate = () => {
         console.log(err);
       });
     }
-    console.log(notifications);
+
+  // 팀원 초대 알림
+  const invitenotification = () => {
+    axios.get(`http://localhost:8080/api/team-invite`, {
+      headers: {
+        'Access_Token' : localStorage.getItem('Access_Token')
+      }
+    }).then((res) => {
+      console.log("API응답: ", res.data);
+      const teamInviteInfoDTOList = Array.isArray(res.data.teamInviteInfoDTOList) ? res.data.teamInviteInfoDTOList : [];
+      console.log("배열", teamInviteInfoDTOList)
+      setNotifications((prevNotifications) => {
+        const combined = [...prevNotifications, ...teamInviteInfoDTOList];
+          // 중복 제거 (notificationId 또는 matchNotificationId 기준)
+          const uniqueNotifications = combined.filter(
+            (notification, index, self) =>
+              index === self.findIndex((n) => n.inviteId === notification.inviteId)
+          );
+          return uniqueNotifications;
+      })
+      console.log("팀원 초대 알림", teamInviteInfoDTOList);
+    }).catch((err) => {
+      console.log(err);
+    })
+  }
+
+    // 팀 가입 알림
+    const getnotification = () => {
+      axios.get(`http://localhost:8080/api/team-join`, {
+        headers: {
+          'Access_Token': localStorage.getItem('Access_Token')
+        }
+      })
+      .then((res) => {
+        const joinNotifications = Array.isArray(res.data.joinNotifications) ? res.data.joinNotifications : [];
+        setNotifications((prevNotifications) => {
+          const combined = [...prevNotifications, ...joinNotifications];
+          // 중복 제거 (notificationId 또는 matchNotificationId 기준)
+          const uniqueNotifications = combined.filter(
+            (notification, index, self) =>
+              index === self.findIndex((n) => n.notificationId === notification.notificationId)
+          );
+          return uniqueNotifications;
+      });
+        console.log("팀가입알림 ", res.data.joinNotifications);
+      }).catch((err) => {
+        console.log(err);
+      })
+    };
+
     useEffect(() => {
       getnotification();
       matchnotification();
+      invitenotification();
     },[]);
 
     
@@ -130,10 +157,12 @@ const Navigate = () => {
         }
       }).then((res) => {
         if(isJoin) {
-          alert("지원자의 요청이 수락되었습니다.")
-        } else {
+          alert("지원자의 요청이 수락되었습니다.");
+        }
+      else {
           alert("지원자의 요청을 거절하였습니다.");
         }
+        console.log()
         handleCloseApplyModal();
         getnotification(); 
       }).catch((err) => {
@@ -144,7 +173,6 @@ const Navigate = () => {
         }
       })
     }
-
 
   // 매치 승인여부
   const handleMatch = (status) => {
@@ -174,6 +202,35 @@ const Navigate = () => {
     })
   }
 
+  // 팀원 초대 승인여부
+  const handleInvite = (isJoin) => {
+    const inviteId = selectedMember.inviteId;
+    console.log(inviteId)
+    axios.delete(`http://localhost:8080/api/team-invite`, {
+      data: {
+        inviteId: inviteId,
+        isJoin: isJoin
+      },
+      headers: {
+        'Access_Token': localStorage.getItem('Access_Token')
+      }
+    }).then((res) => {
+      if(isJoin) {
+        alert("팀 초대를 수락하였습니다.");
+        navigate("/");
+      } else {
+        alert("팀 초대를 거절하였습니다.");
+      }
+    }).catch((err) => {
+      console.log(err);
+      if(isJoin) {
+        alert("팀 초대 수락을 실패하였습니다.");
+      } else {
+        alert("팀 초대 거절을 실패하였습니다.");
+      }
+    })
+  };
+
   return (
     <>
       <Navbar expand="lg" className="bg-body-tertiary">
@@ -201,18 +258,22 @@ const Navigate = () => {
                   </NotiIcon>
                   {showNotifications && (
                     <NotiDropdown>
-                      {notifications && notifications.length > 0 ? (
-                        notifications.map((noti, index) => (
-                          <NotiItem key={noti.notificationId || noti.matchNotificationId} onClick={() => toggleApplyModal(noti)}>
-                            {noti.matchNotificationId 
-                            ? `${noti.content}`
-                            : `${noti.memberName}님이 ${noti.teamName}에 지원하였습니다.`}
-                            </NotiItem>
-                        ))
-                      ) : (
-                        <NotiItem>알림이 없습니다.</NotiItem>
-                      )}
-
+                  {notifications && notifications.length > 0 ? (
+                    notifications.map((noti, index) => (
+                      <NotiItem key={noti.notificationId || noti.matchNotificationId || noti.inviteId} onClick={() => toggleApplyModal(noti)}>
+                      {noti.inviteId 
+                        ? `${noti.teamName}팀에서 초대가 왔습니다.` // 초대 알림 처리
+                        : noti.matchNotificationId 
+                          ? `${noti.content}` // 매치 신청 알림 처리
+                          : noti.notificationId // 팀 가입 알림 처리
+                            ? `${noti.memberName}님이 ${noti.teamName}에 지원하였습니다.` 
+                            : '알 수 없는 알림입니다.' // 예외 처리
+                      }
+                      </NotiItem>
+                    ))
+                  ) : (
+                    <NotiItem>알림이 없습니다.</NotiItem>
+                  )}      
                     </NotiDropdown>
                   )}
                 </div>
@@ -235,33 +296,49 @@ const Navigate = () => {
           <Modal.Title>지원자 정보</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-  {selectedMember ? (
-    <>
-      {selectedMember.matchNotificationId ? (
-        <>
-          <p><strong>매치 신청 팀:</strong> {selectedMember.teamName}</p>
-          <p><strong>신청 날짜:</strong> {new Date(selectedMember.date).toLocaleDateString()}</p>
-          <ButtonWrapper>
-            <ActionButton onClick={() => handleMatch(true)}>수락</ActionButton>
-            <ActionButton onClick={() => handleMatch(false)}>거절</ActionButton>
-          </ButtonWrapper>
-        </>
-      ) : (
-        <>
-          <p><strong>지원자:</strong> {selectedMember.memberName}</p>
-          <p><strong>지원자 아이디:</strong> {selectedMember.memberId}</p>
-          <p><strong>지원 팀:</strong> {selectedMember.teamName}</p>
-          <p><strong>지원 날짜:</strong> {new Date(selectedMember.date).toLocaleDateString()}</p>
-          <ButtonWrapper>
-            <ActionButton onClick={() => handleAccept(true)}>수락</ActionButton>
-            <ActionButton onClick={() => handleAccept(false)}>거절</ActionButton>
-          </ButtonWrapper>
-        </>
-      )}
-    </>
-  ) : (
-    <p>지원자 정보를 불러오지 못했습니다.</p>
-  )}
+        {selectedMember ? (
+  <>
+    {/* 매치 신청 정보 */}
+    {selectedMember.matchNotificationId && (
+      <>
+        <p><strong>매치 신청 팀:</strong> {selectedMember.teamName}</p>
+        <p><strong>신청 날짜:</strong> {new Date(selectedMember.date).toLocaleDateString()}</p>
+        <ButtonWrapper>
+          <ActionButton onClick={() => handleMatch(true)}>수락</ActionButton>
+          <ActionButton onClick={() => handleMatch(false)}>거절</ActionButton>
+        </ButtonWrapper>
+      </>
+    )}
+    
+    {/* 지원자 정보 */}
+    {selectedMember.notificationId && (
+      <>
+        <p><strong>지원자:</strong> {selectedMember.memberName}</p>
+        <p><strong>지원자 아이디:</strong> {selectedMember.memberId}</p>
+        <p><strong>지원 팀:</strong> {selectedMember.teamName}</p>
+        <p><strong>지원 날짜:</strong> {new Date(selectedMember.date).toLocaleDateString()}</p>
+        <ButtonWrapper>
+          <ActionButton onClick={() => handleAccept(true)}>수락</ActionButton>
+          <ActionButton onClick={() => handleAccept(false)}>거절</ActionButton>
+        </ButtonWrapper>
+      </>
+    )}
+    
+    {/* 초대 수락/거절 버튼 */}
+    {selectedMember.inviteId && (
+      <>
+      <p><strong>초대 팀:</strong> {selectedMember.teamName}</p>
+      <ButtonWrapper>
+        <ActionButton onClick={() => handleInvite(true)}>초대 수락</ActionButton>
+        <ActionButton onClick={() => handleInvite(false)}>초대 거절</ActionButton>
+      </ButtonWrapper>
+      </>
+    )}
+  </>
+) : (
+  <p>지원자 정보를 불러오지 못했습니다.</p>
+)}
+
 </Modal.Body>
       </Modal>
     </>
